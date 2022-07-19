@@ -123,6 +123,7 @@ function App() {
       }
 
       setFile(inputFile);
+      console.log(document);
     }
   };
 
