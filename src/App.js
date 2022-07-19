@@ -26,6 +26,7 @@ const checkHowManyDaysOverlap = (employee1, employee2) => {
     const laterStart = employee1StartDate > employee2StartDate ? employee1StartDate : employee2StartDate;
     const firstEnd = employee1EndDate < employee2EndDate ? employee1EndDate : employee2EndDate;
     const timeTogether = Math.abs(firstEnd - laterStart);
+
     return Math.floor(timeTogether / (1000 * 60 * 60 * 24));
   } else {
     return 0
@@ -50,34 +51,28 @@ const calculatingDays = (data, setFilteredData) => {
         let daysTogether = checkHowManyDaysOverlap(project[i], project[j])
 
         if (daysTogether) {
-          if (!employees.hasOwnProperty(project[i].EmpID + "-" + project[j].EmpID)
-            && !employees.hasOwnProperty(project[j].EmpID + "-" + project[i].EmpID)) {
-            employees[project[i].EmpID + "-" + project[j].EmpID] = [{
+          const key = project[i].EmpID + "-" + project[j].EmpID;
+          const reversedKey = project[j].EmpID + "-" + project[i].EmpID;
+
+          if (!employees[key] && !employees[reversedKey]) {
+            employees[key] = [{
               project: project[0].ProjectId,
               days: daysTogether
             }];
-          } else if (employees[project[i].EmpID + "-" + project[j].EmpID]) {
-            if (employees[project[i].EmpID + "-" + project[j].EmpID].find((obj) => {
-              return obj.project === project[0].ProjectId;
-            })) {
-              employees[project[i].EmpID + "-" + project[j].EmpID].find((obj) => {
-                return obj.project === project[0].ProjectId;
-              }).days += daysTogether;
+          } else if (employees[key]) {
+            if (employees[key].find((obj) => obj.project === project[0].ProjectId)) {
+              employees[key].find((obj) => obj.project === project[0].ProjectId).days += daysTogether;
             } else {
-              employees[project[i].EmpID + "-" + project[j].EmpID].push({
+              employees[key].push({
                 project: project[0].ProjectId,
                 days: daysTogether
               });
             }
-          } else if (employees[project[j].EmpID + "-" + project[i].EmpID]) {
-            if (employees[project[j].EmpID + "-" + project[i].EmpID].find((obj) => {
-              return obj.project === project[0].ProjectId;
-            })) {
-              employees[project[j].EmpID + "-" + project[i].EmpID].find((obj) => {
-                return obj.project === project[0].ProjectId;
-              }).days += daysTogether;
+          } else if (employees[reversedKey]) {
+            if (employees[reversedKey].find((obj) => obj.project === project[0].ProjectId)) {
+              employees[reversedKey].find((obj) => obj.project === project[0].ProjectId).days += daysTogether;
             } else {
-              employees[project[j].EmpID + "-" + project[i].EmpID].push({
+              employees[reversedKey].push({
                 project: project[0].ProjectId,
                 days: daysTogether
               });
@@ -87,7 +82,7 @@ const calculatingDays = (data, setFilteredData) => {
       }
     }
   }
-  
+
   setFilteredData(employees);
 }
 
@@ -97,7 +92,7 @@ const findMostColaboration = (data, setCoupleWithMostDays) => {
     days: 0,
   };
 
-  for (let couple of Object.entries(data)){
+  for (let couple of Object.entries(data)) {
     let total = couple[1].reduce((total, days) => total + days.days, 0);
 
     if (total > mostDays.days) {
@@ -141,7 +136,7 @@ function App() {
 
       calculatingDays(csv.data, setFilteredData);
     };
-    
+
     reader.readAsText(file);
   };
 
@@ -171,7 +166,7 @@ function App() {
               <th>Employee ID #1</th>
               <th>Employee ID #2</th>
               <th>Project ID</th>
-              <th>Days worked</th>
+              <th>Days Worked</th>
             </tr>
           </thead>
           <tbody>
